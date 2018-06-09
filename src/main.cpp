@@ -313,7 +313,7 @@ int main() {
 											
 
 											check_car_s_lane2+=((double)prev_size*.02*check_speed_lane2);
-											
+											// std::cout<<check_car_s_lane2<<' '<<car_s<<endl;
 
 											if(check_car_s_lane2>car_s)
 											{
