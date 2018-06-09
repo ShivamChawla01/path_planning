@@ -269,86 +269,252 @@ int main() {
 							{
 								lane3.push_back(i);
 							}
+						}
+
+						for(int i=0;i<sensor_fusion.size();i++)
+						{
+							float d=sensor_fusion[i][6];
+							
 							if(d<(2+4*lane+2) && d>(2+4*lane-2))
 							{
 								double vx=sensor_fusion[i][3];
 								double vy=sensor_fusion[i][4];
 								double check_speed=sqrt(vx*vx+vy*vy);
 								double check_car_s=sensor_fusion[i][5];
-
+								double min_distance=40.0;
 								check_car_s+=((double)prev_size*.02*check_speed);
+								bool flag1=true;
+								bool flag2=true;
+								double check_car_s_lane1=0.0;
+								double check_car_s_lane2=0.0;
+								double check_car_s_lane3=0.0;
+								double check_speed_lane2=0.0;
+								double check_speed_lane1=0.0;
+								double check_speed_lane3=0.0;
 
 								if((check_car_s>car_s) && ((check_car_s-car_s)<30))
 								{
 									// ref_vel=29.5;
 									too_close=true;
-									double min_distance_left=40.0;
-									double min_distance_right=40.0;
-									double check_car_s_lane1;
-									double check_car_s_lane2;
-									double check_car_s_lane3;
+									// double min_distance_left=40.0;
+									// double min_distance_right=40.0;
+									
+									
 									std::cout<<lane<<endl;
-									if(lane==0)
+									if(lane==0 || lane==2)
 									{
+										std::cout<<lane<<flag1<<flag2<<endl;
 										for(int i=0;i<lane2.size();i++)
 										{
+											double vx_lane2=sensor_fusion[lane2[i]][3];
+											double vy_lane2=sensor_fusion[lane2[i]][4];
+											check_speed_lane2=sqrt(vx_lane2*vx_lane2+vy_lane2*vy_lane2);
 											check_car_s_lane2=sensor_fusion[lane2[i]][5];
-											if(min_distance_right>abs(check_car_s_lane2-car_s))
+											
+
+											check_car_s_lane2+=((double)prev_size*.02*check_speed_lane2);
+											
+
+											if(check_car_s_lane2>car_s)
 											{
-												min_distance_right=abs(check_car_s_lane2-car_s);
-											}
-										}
-										if(min_distance_right>=10)
-										{
-											lane=1;
-										}
-									}
-									else if(lane==1)
-									{
-										for(int i=0;i<lane1.size();i++)
-										{
-											check_car_s_lane1=sensor_fusion[lane1[i]][5];
-											if(min_distance_left>abs(check_car_s_lane1-car_s))
-											{
-												min_distance_left=abs(check_car_s_lane1-car_s);
-											}
-										}
-										std::cout<<check_car_s_lane1<<' '<<car_s<<' '<<min_distance_left<<endl;
-										if(min_distance_left>=10)
-										{
-											lane=0;
-										}
-										else if(min_distance_left<10)
-										{
-											for(int i=0;i<lane3.size();i++)
-											{
-												check_car_s_lane3=sensor_fusion[lane3[i]][5];
-												if(min_distance_right>abs(check_car_s_lane3-car_s))
+												if(check_car_s_lane2-car_s<30)
 												{
-													min_distance_right=abs(check_car_s_lane3-car_s);
+													flag1=false;
+													
 												}
 											}
-											if(min_distance_right>=10)
+											else if(car_s>=check_car_s_lane2)
 											{
-												lane=2;
+												if(car_s-check_car_s_lane2<20)
+												{
+													flag2=false;
+													
+												}
 											}
+										
 										}
-									}
-									else if(lane==2)
-									{
-										for(int i=0;i<lane2.size();i++)
-										{
-											check_car_s_lane2=sensor_fusion[i][5];
-											if(min_distance_left>abs(check_car_s_lane2-car_s))
-											{
-												min_distance_left=abs(check_car_s_lane2-car_s);
-											}
-										}
-										if(min_distance_left>=10)
+
+										if(flag1 && flag2)
 										{
 											lane=1;
+											
 										}
 									}
+
+									else if(lane==1)
+									{
+										std::cout<<lane<<flag1<<flag2<<endl;
+										for(int i=0;i<lane1.size();i++)
+										{
+											double vx_lane1=sensor_fusion[lane1[i]][3];
+											double vy_lane1=sensor_fusion[lane1[i]][4];
+											check_speed_lane1=sqrt(vx_lane1*vx_lane1+vy_lane1*vy_lane1);
+											check_car_s_lane1=sensor_fusion[lane1[i]][5];
+											
+
+											check_car_s_lane1+=((double)prev_size*.02*check_speed_lane1);
+
+											if(check_car_s_lane1>car_s)
+											{
+												if(check_car_s_lane1-car_s<30)
+												{
+													flag1=false;
+													
+												}
+											}
+											else if(car_s>=check_car_s_lane1)
+											{
+												if(car_s-check_car_s_lane1<20)
+												{
+													flag2=false;
+													
+												}
+											}
+										}
+
+										if(flag1 && flag2)
+										{
+											lane=0;
+											
+										}
+										 else
+										 {
+											 flag1=true;
+											 flag2=true;
+											 
+										for(int i=0;i<lane3.size();i++)
+										{
+											double vx_lane3=sensor_fusion[lane3[i]][3];
+											double vy_lane3=sensor_fusion[lane3[i]][4];
+											check_speed_lane3=sqrt(vx_lane3*vx_lane3+vy_lane3*vy_lane3);
+											check_car_s_lane3=sensor_fusion[lane3[i]][5];
+											
+
+											check_car_s_lane3+=((double)prev_size*.02*check_speed_lane3);
+
+											if(check_car_s_lane3>car_s)
+											{
+												if(check_car_s_lane3-car_s<30)
+												{
+													flag1=false;
+													
+												}
+											}
+											else if(car_s>=check_car_s_lane3)
+											{
+												if(car_s-check_car_s_lane3<20)
+												{
+													flag2=false;
+													
+												}
+											}
+										}
+
+										if(flag1 && flag2)
+										{
+											lane=2;
+											
+										}
+										 }
+										// 	flag1=true;
+										// 	flag2=true;
+										// 	for(int i=0;i<lane3.size();i++)
+										// 	{
+										// 		double vx_lane3=sensor_fusion[lane3[i]][3];
+										// 		double vy_lane3=sensor_fusion[lane3[i]][4];
+										// 		check_speed_lane3=sqrt(vx_lane3*vx_lane3+vy_lane3*vy_lane3);
+										// 		check_car_s_lane3=sensor_fusion[lane3[i]][5];
+											
+
+										// 		check_car_s_lane3+=((double)prev_size*.02*check_speed_lane3);
+
+										// 		if(check_car_s_lane3>car_s)
+										// 		{
+										// 			if(check_car_s_lane3-car_s<30)
+										// 			{
+										// 				flag1=false;
+										// 			}
+										// 		}
+										// 		else if(car_s>=check_car_s_lane3)
+										// 		{
+										// 			if(car_s-check_car_s_lane3<15)
+										// 			{
+										// 				flag2=false;
+										// 			}
+										// 		}
+										// 	}
+
+										// 	if(flag1 && flag2)
+										// 	{
+										// 		lane=2;
+										// 		flag1=true;
+										// 		flag2=true;
+										// 	}
+										// }
+									}
+									
+										
+
+
+								
+									
+									
+									// else if(lane==1)
+									// {
+									// 	min_distance_left=40.0;
+									// 	min_distance_right=40.0;
+									// 	for(int i=0;i<lane1.size();i++)
+									// 	{
+									// 		double vx_lane1=sensor_fusion[lane1[i]][3];
+									// 		double vy_lane1=sensor_fusion[lane1[i]][4];
+									// 		double check_speed_lane1=sqrt(vx_lane1*vx_lane1+vy_lane1*vy_lane1);
+									// 		check_car_s_lane1=sensor_fusion[lane1[i]][5];
+
+											
+									// 		check_car_s_lane1+=((double)prev_size*.02*check_speed_lane1);
+											
+									// 		if(check_car_s_lane1+15<=car_s)
+									// 		{
+									// 			continue;
+									// 		}
+									// 		if(min_distance_left>abs(check_car_s_lane1-car_s))
+									// 		{
+									// 			min_distance_left=abs(check_car_s_lane1-car_s);
+												
+									// 		}
+									// 	}
+									// 	if(min_distance_left>=30)
+									// 	{
+									// 		lane=0;
+									// 		std::cout<<min_distance_left<<endl;
+									// 	}
+									
+										
+									// }
+									
+									
+									// else if(lane==2)
+									// {
+									// 	for(int i=0;i<lane2.size();i++)
+									// 	{
+									// 		check_car_s_lane2=sensor_fusion[lane2[i]][5];
+									// 		if(check_car_s_lane2+10<=car_s)
+									// 			{
+									// 				continue;
+									// 			}
+									// 		if(min_distance_left>abs(check_car_s_lane2-car_s))
+									// 		{
+
+									// 			min_distance_left=abs(check_car_s_lane2-car_s);
+									// 			// std::cout<<check_car_s_lane2<<' '<<car_s<<' '<<min_distance_left<<endl;
+									// 		}
+									// 	}
+									// 	if(min_distance_left>=30)
+									// 	{
+									// 		lane=1;
+									// 		std::cout<<min_distance_left<<endl;
+									// 	}
+									// }
 									
 
 
